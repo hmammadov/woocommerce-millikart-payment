@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WooCommerce MilliKart Payment
-Plugin URI:  
+Plugin URI:  https://github.com/hmammadov/woocommerce-millikart-payment
 Description: MilliKart Payment Gateway for WooCommerce.
 Version:     1.0.0
 Author:      Huseyn Mammadov
