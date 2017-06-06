@@ -30,7 +30,10 @@ if(in_array('woocommerce/woocommerce.php', $active_plugins)){
 
 //Payment status checking
 add_action('wp', function(){
-    if(isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'millikart_callback.php') !== false){
+    $millikart_options = new WC_Millikart_Payment();
+    $callback_url = $millikart_options->callback_url;
+    $callback_url = substr($callback_url, strrpos($callback_url, '/') + 1);
+    if(isset($_SERVER['REQUEST_URI']) && isset($_GET['reference']) && strpos($_SERVER['REQUEST_URI'], $callback_url) !== false){
         global $wpdb;
         //Get order_id if reference isset
         $order_id = $wpdb->get_results($wpdb->prepare( "SELECT order_id, language FROM " . $wpdb->prefix . "woocommerce_millikart WHERE reference = '%s' LIMIT 1", $_GET['reference']));
@@ -39,8 +42,7 @@ add_action('wp', function(){
 	        $array = json_decode(json_encode($order_id), True);
             $language = $array[0]['language'];
             $order_id = $array[0]['order_id'];
-            //Get mid
-            $millikart_options = new WC_Millikart_Payment();
+            //Get data from plugin settings
             $mid = $millikart_options->mid;
             $payment_status = $millikart_options->payment_status;
             //Get payment status from Millikart
