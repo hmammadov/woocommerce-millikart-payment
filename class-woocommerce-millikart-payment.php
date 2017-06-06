@@ -13,6 +13,7 @@ class WC_Millikart_Payment extends WC_Payment_Gateway{
         $this->mid = $this->get_option('mid');
 		$this->pskey = $this->get_option('pskey');
 		$this->currency = $this->get_option('currency');
+        $this->callback_url = $this->get_option('callback_url');
 		$this->paymenturl = $this->get_option('paymenturl');
 		$this->payment_status = $this->get_option('payment_status');
 		add_action('woocommerce_update_options_payment_gateways_'.$this->id, array($this, 'process_admin_options'));
@@ -52,6 +53,13 @@ class WC_Millikart_Payment extends WC_Payment_Gateway{
                 'type' 			=> 'text',
                 'description' 	=> __('Currency code of payment by ISO 4217 (ex.: AZN = 944)', 'woocommerce-millikart-payment'),
                 'placeholder'	=> __('ex.: 944', 'woocommerce-millikart-payment'),
+                'desc_tip'		=> true,
+            ),
+            'callback_url' => array(
+                'title' 		=> __('Callback URL', 'woocommerce-millikart-payment'),
+                'type' 			=> 'text',
+                'description' 	=> __('The callback URL that was set on registration in MilliKart.', 'woocommerce-millikart-payment'),
+                'placeholder'	=> __('ex.: http(s)://your.domain/millikart_callback.php', 'woocommerce-millikart-payment'),
                 'desc_tip'		=> true,
             ),
             'paymenturl' => array(
