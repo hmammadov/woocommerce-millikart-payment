@@ -30,10 +30,10 @@ if(in_array('woocommerce/woocommerce.php', $active_plugins)){
 
 //Payment status checking
 add_action('wp', function(){
-    if(isset($_GET['millikart_reference'])){
+    if(isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'millikart_callback.php') !== false){
         global $wpdb;
         //Get order_id if reference isset
-        $order_id = $wpdb->get_results($wpdb->prepare( "SELECT order_id, language FROM " . $wpdb->prefix . "woocommerce_millikart WHERE reference = '%s' LIMIT 1", $_GET['millikart_reference']));
+        $order_id = $wpdb->get_results($wpdb->prepare( "SELECT order_id, language FROM " . $wpdb->prefix . "woocommerce_millikart WHERE reference = '%s' LIMIT 1", $_GET['reference']));
         //If reference isset
         if($order_id == true){
 	        $array = json_decode(json_encode($order_id), True);
@@ -44,7 +44,7 @@ add_action('wp', function(){
             $mid = $millikart_options->mid;
             $payment_status = $millikart_options->payment_status;
             //Get payment status from Millikart
-            $url = $payment_status.'?mid='.$mid.'&reference='.$_GET['millikart_reference'];
+            $url = $payment_status.'?mid='.$mid.'&reference='.$_GET['reference'];
             $xml = file_get_contents($url);
             $xml = simplexml_load_string($xml);
             $RCcode = $xml->RC;
@@ -94,26 +94,8 @@ function millikart_install(){
         dbDelta($sql);
         add_option("millikart_db_version", $millikart_db_version);
     }
-    //Creating callback.php file for MilliKart reference
-    if(file_exists('../millikart_callback.php')){}else{
-        $callback = fopen('../millikart_callback.php', 'w');
-        $phpcode = "<?php\n";
-        $phpcode .= "\$reference = \$_GET['reference'];\n";
-        $phpcode .= "header(\"Location: index.php?millikart_reference=\".\$reference);\n";
-        $phpcode .= "exit;\n";
-        $phpcode .= "?>";
-        fwrite($callback, $phpcode);
-        fclose($callback);
-    }
 }
 register_activation_hook(__FILE__,'millikart_install');
-
-//On plugin deactivating
-function millikart_deactivating(){
-    //Delete millikart_callback.php
-    unlink('../callback.php');
-}    
-register_deactivation_hook(__FILE__, 'millikart_deactivating');
 
 // Add Settings link
 function millikart_settings_link($links) {
